@@ -15,14 +15,16 @@ console.log("Definition of variables");
 let canvasContainer = document.getElementById("canvas-container");
 let data = {
   screen: {
-    width: 640,
-    height: 480,
+    width: 800,
+    height: 600,
     halfWidth: null,
     halfHeight: null,
-    scale: 4,
+    scale: 1,
   },
   render: {
-    delay: 30,
+    delay: 16.6,
+    lastUpdate: null,
+    frameInterval: 1000 / 60,
   },
   projection: {
     width: null,
@@ -44,8 +46,8 @@ let data = {
     angle: 90,
     radius: 10,
     speed: {
-      movement: 0.1,
-      rotation: 4.0,
+      movement: 0.05,
+      rotation: 1.5,
     },
     movement: {
       y: 0,
@@ -62,9 +64,9 @@ let data = {
     [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
     [2, 0, 0, 0, 0, 0, 0, 0, 0, 2],
     [2, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+    [2, 0, 0, 0, 1, 0, 0, 0, 0, 2],
     [2, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-    [2, 0, 0, 0, 2, 2, 0, 0, 0, 2],
-    [2, 0, 0, 0, 2, 2, 0, 0, 0, 2],
+    [2, 0, 0, 0, 0, 0, 0, 0, 0, 2],
     [2, 0, 0, 0, 0, 0, 0, 0, 0, 2],
     [2, 0, 0, 0, 0, 0, 0, 0, 0, 2],
     [2, 0, 0, 0, 0, 0, 0, 0, 0, 2],
@@ -72,12 +74,25 @@ let data = {
   ],
   textures: [
     {
-      a: "b",
+      name: "test_floor",
+      id: "test_floor",
+      width: 16,
+      height: 16,
+      data: null,
     },
     {
       name: "wall",
       id: "brickwall",
       number: 2,
+      width: 16,
+      height: 16,
+      data: null,
+    },
+  ],
+  floorTextures: [
+    {
+      name: "test_floor",
+      id: "test_floor",
       width: 16,
       height: 16,
       data: null,
@@ -158,21 +173,27 @@ function rayCasting() {
 
     drawSky(rayCount, wallHeight);
     drawTexture(rayCount, wallHeight, texturePositionX, texture);
-    drawFloor(rayCount, wallHeight);
+    drawFloor(rayCount, wallHeight, rayAngle);
 
     rayAngle += data.rayCasting.incrementAngle;
   }
 }
 
 function main() {
-  loop = setInterval(() => {
-    clearScreen();
-    movementPlayer();
-    rayCasting();
-    renderBuffer();
-  }, data.render.delay);
-  // rayCasting();
-  // movementPlayer();
+  const render = (timestamp) => {
+    if (
+      !data.render.lastUpdate ||
+      timestamp - data.render.lastUpdate > data.render.frameInterval
+    ) {
+      clearScreen();
+      movementPlayer();
+      rayCasting();
+      renderBuffer();
+      data.render.lastUpdate = timestamp;
+    }
+    requestAnimationFrame(render);
+  };
+  requestAnimationFrame(render);
 }
 
 window.onload = () => {

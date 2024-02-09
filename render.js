@@ -32,13 +32,28 @@ function drawSky(rayCount, wallHeight) {
 //   );
 // }
 
-function drawFloor(rayCount, wallHeight) {
-  drawLine(
-    rayCount,
-    data.projection.halfHeight + wallHeight,
-    data.projection.height,
-    new Color(96, 87, 79, 255)
-  );
+function drawFloor(x1, wallHeight, rayAngle) {
+  let start = data.projection.halfHeight + wallHeight + 1;
+  let directionCos = Math.cos(degreeToRadians(rayAngle));
+  let directionSin = Math.sin(degreeToRadians(rayAngle));
+  for (let y = start; y < data.projection.height; y++) {
+    let distance = data.projection.height / (2 * y - data.projection.height);
+    distance =
+      distance /
+      Math.cos(degreeToRadians(data.player.angle) - degreeToRadians(rayAngle));
+    let tileX = distance * directionCos + data.player.x;
+    let tileY = distance * directionSin + data.player.y;
+
+    let tile = data.map[Math.floor(tileY)][Math.floor(tileX)];
+    let texture = data.floorTextures[tile];
+    if (!texture) continue;
+
+    let texture_x = Math.floor(tileX * texture.width) % texture.width;
+    let texture_y = Math.floor(tileY * texture.height) % texture.height;
+
+    let color = texture.data[texture_x + texture_y * texture.width];
+    drawPixel(x1, y, color);
+  }
 }
 
 function drawTexture(x, wallHeight, texturePositionX, texture) {
@@ -51,7 +66,7 @@ function drawTexture(x, wallHeight, texturePositionX, texture) {
       color = texture.data[texturePositionX + i * texture.width];
     } else color = texture.colors[texture.bitmap[i][texturePositionX]];
 
-    drawLine(x, y, Math.floor(y + (yIncrementer + 0.5)), color);
+    drawLine(x, y, Math.floor(y + (yIncrementer + 2)), color);
     y += yIncrementer;
   }
 }
@@ -70,6 +85,12 @@ function loadTextures() {
   for (let i = 0; i < data.textures.length; i++) {
     if (data.textures[i].id) {
       data.textures[i].data = getTextureData(data.textures[i]);
+    }
+  }
+
+  for (let i = 0; i < data.floorTextures.length; i++) {
+    if (data.floorTextures[i].id) {
+      data.floorTextures[i].data = getTextureData(data.floorTextures[i]);
     }
   }
 }
