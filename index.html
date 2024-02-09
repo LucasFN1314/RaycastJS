@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Raycasting demo</title>
+  </head>
+  <body>
+    <img id="darksky" src="images/darksky.png" style="display: none" />
+    <img id="brickwall" src="images/brickwall.png" style="display: none" />
+    <div id="canvas-container"></div>
+
+    <script src="color.js"></script>
+    <script src="utils.js"></script>
+    <script src="render.js"></script>
+    <script src="playerController.js"></script>
+    <script src="index.js"></script>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      #canvas-container {
+        width: 100%;
+        height: 100vh;
+
+        background: rgb(200, 200, 200);
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
+  </body>
+</html>
